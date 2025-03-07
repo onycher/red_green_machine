@@ -1,0 +1,17 @@
+[project]
+name = "red-green-machine"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "google-genai>=1.2.0",
+  "gradio>=5.15.0",
+  "ollama>=0.4.7",
+  "parse>=1.20.2",
+  "pydantic-ai[logfire]>=0.0.24",
+  "textual>=2.1.0",
+]
+
+[dependency-groups]
+dev = ["pyright>=1.1.393", "ruff>=0.9.4"]
