@@ -5,7 +5,6 @@ from pathlib import Path
 from subprocess import run
 from typing import Any, Generator, Optional, Type
 
-import ollama
 from google import genai
 from google.genai import types
 import prompts
@@ -29,7 +28,7 @@ def generate(model, prompt, system):
                     temperature=0.9,
                 ),
             )
-        except:
+        except Exception:
             time.sleep(60)
             continue
     raise ConnectionError()
@@ -66,7 +65,7 @@ def generate_code(model, prompt, system):
                     },
                 ),
             )
-        except:
+        except Exception:
             time.sleep(60)
             continue
     raise ConnectionError()
@@ -114,6 +113,7 @@ class AnalystAgent(Agent):
         prompt = f"""{format_repo_content(self.ctx.repo_content)}
 Test results:
 {input}"""
+        content = []
         for i in range(3):
             try:
                 response = generate(
@@ -121,12 +121,11 @@ Test results:
                     prompt,
                     system=prompts.orchestrator_system_prompt,
                 )
-                content = []
                 for part in response:
                     content.append(part.text)
                     yield None, None, part.text
                 break
-            except:
+            except Exception:
                 time.sleep(60)
         yield self.ctx.node(CoderAgent), "".join(content), None
 
@@ -145,6 +144,7 @@ class CoderAgent(Agent):
         prompt = f"""This is the current state of the repository:
 {format_repo_content(self.ctx.repo_content)}
 {input}"""
+        content = []
         for i in range(3):
             try:
                 response = generate_code(
@@ -152,12 +152,11 @@ class CoderAgent(Agent):
                     prompt,
                     system=prompts.coder_system_prompt,
                 )
-                content = []
                 for part in response:
                     content.append(part.text)
                     yield None, None, part.text
                 break
-            except:
+            except Exception:
                 time.sleep(60)
 
         content = "".join(content)
@@ -185,6 +184,7 @@ class RefactorAgent(Agent):
         prompt = f"""This is the current state of the repository:
 {format_repo_content(self.ctx.repo_content)}
 {input}"""
+        content = []
         for i in range(3):
             try:
                 response = generate_code(
@@ -192,12 +192,11 @@ class RefactorAgent(Agent):
                     prompt,
                     system=prompts.refactor_system_prompt,
                 )
-                content = []
                 for part in response:
                     content.append(part.text)
                     yield None, None, part.text
                 break
-            except:
+            except Exception:
                 time.sleep(60)
 
         content = "".join(content)

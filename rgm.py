@@ -1,6 +1,8 @@
 from pathlib import Path
 import json
+from typing import Generator, Optional, Type, Any
 from agents import (
+    Agent,
     AgentGraph,
     AnalystAgent,
     CoderAgent,
@@ -12,8 +14,14 @@ from agents import (
 )
 
 import gradio as gr
+import os
 
 from data import Repo
+
+
+def get_default_repo_path():
+    """Get the default repository path from environment or current directory."""
+    return Path(os.environ.get("RGM_REPO_PATH", "."))
 
 
 with gr.Blocks() as rgm:
@@ -27,7 +35,7 @@ with gr.Blocks() as rgm:
 
     def run_rgm(history, run):
         repo = Repo(
-            path=Path("C:/test"),
+            path=get_default_repo_path(),
             includes=[".py"],
             excludes=[".venv", ".python-version"],
             test_cmd="uv run pytest",
@@ -62,7 +70,7 @@ with gr.Blocks() as rgm:
             else:
                 history.append({"role": "assistant", "content": ""})
 
-            for part in node:
+            for part in node:  # type: ignore[misc]
                 agent, input, output = part
 
                 if agent is not None:
